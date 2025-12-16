@@ -1,5 +1,6 @@
 mod hittable;
 mod hittable_list;
+mod interval;
 mod ray;
 mod render;
 mod sphere;

@@ -1,12 +1,10 @@
-use std::{
-    f64,
-    io::{BufWriter, StdoutLock, Write},
-};
+use std::io::{BufWriter, StdoutLock, Write};
 
 use indicatif::ProgressIterator;
 
 use crate::{
-    hittable::Hittable, hittable_list::HittableList, ray::Ray, vec3::Vec3, viewport::Viewport,
+    hittable::Hittable, hittable_list::HittableList, interval::Interval, ray::Ray, vec3::Vec3,
+    viewport::Viewport,
 };
 
 fn write_color(color: Vec3<f64>, handle: &mut BufWriter<StdoutLock<'_>>) {
@@ -18,7 +16,7 @@ fn write_color(color: Vec3<f64>, handle: &mut BufWriter<StdoutLock<'_>>) {
 
 fn ray_color(ray: &Ray, world: &HittableList) -> Vec3<f64> {
     // Sphere intersection
-    if let Some(rec) = world.hit(ray, 0.0, f64::INFINITY) {
+    if let Some(rec) = world.hit(ray, Interval::new(0.0, f64::INFINITY)) {
         let normal: Vec3<f64> = rec.normal;
         return Vec3::new(
             0.5 * (normal.x() + 1.0),

@@ -2,6 +2,7 @@
 
 use crate::{
     hittable::{HitRecord, Hittable},
+    interval::Interval,
     ray::Ray,
 };
 use std::boxed::Box;
@@ -26,13 +27,13 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, ray: &Ray, tmin: f64, tmax: f64) -> Option<HitRecord> {
-        let mut closest_so_far: f64 = tmax;
+    fn hit(&self, ray: &Ray, interval: Interval) -> Option<HitRecord> {
+        let mut current_interval: Interval = interval;
         let mut closest_hit: Option<HitRecord> = None;
 
         for hittable in &self.hittables {
-            if let Some(rec) = hittable.hit(ray, tmin, closest_so_far) {
-                closest_so_far = rec.t;
+            if let Some(rec) = hittable.hit(ray, current_interval) {
+                current_interval.max = rec.t;
                 closest_hit = Some(rec);
             }
         }
