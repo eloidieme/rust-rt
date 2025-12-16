@@ -7,15 +7,19 @@ use crate::{
     hittable_list::HittableList,
     interval::Interval,
     ray::Ray,
-    utils::{random_offset_vector, random_vector_on_hemisphere},
+    utils::{linear_to_gamma, random_offset_vector, random_unit_vector},
     vec3::Vec3,
     viewport::Viewport,
 };
 
 fn write_color(color: Vec3<f64>, handle: &mut BufWriter<StdoutLock<'_>>) {
-    let ir: u8 = (255.999 * color.x().clamp(0.0, 0.999)) as u8;
-    let ig: u8 = (255.999 * color.y().clamp(0.0, 0.999)) as u8;
-    let ib: u8 = (255.999 * color.z().clamp(0.0, 0.999)) as u8;
+    let r = linear_to_gamma(color.x()).clamp(0.0, 0.999);
+    let g = linear_to_gamma(color.y()).clamp(0.0, 0.999);
+    let b = linear_to_gamma(color.z()).clamp(0.0, 0.999);
+
+    let ir: u8 = (255.999 * r) as u8;
+    let ig: u8 = (255.999 * g) as u8;
+    let ib: u8 = (255.999 * b) as u8;
     writeln!(handle, "{ir} {ig} {ib}").unwrap();
 }
 
@@ -26,7 +30,7 @@ fn ray_color(ray: &Ray, depth: u32, world: &HittableList) -> Vec3<f64> {
 
     // Sphere intersection
     if let Some(rec) = world.hit(ray, Interval::new(0.001, f64::INFINITY)) {
-        let direction: Vec3<f64> = random_vector_on_hemisphere(rec.normal);
+        let direction: Vec3<f64> = rec.normal + random_unit_vector();
         return ray_color(&Ray::new(ray.at(rec.t), direction), depth - 1, world) * 0.5;
     }
 
