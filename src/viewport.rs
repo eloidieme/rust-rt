@@ -2,11 +2,12 @@
 
 use crate::vec3::Vec3;
 
-const DEFAULT_IMG_WIDTH: u32 = 1280;
+const DEFAULT_IMG_WIDTH: u32 = 3840;
 const DEFAULT_VIEWPORT_WIDTH: f64 = 3.5;
 const DEFAULT_ASPECT_RATIO: f64 = 16.0 / 9.0;
 const DEFAULT_FOCAL_LENGTH: f64 = 1.0;
 const DEFAULT_SAMPLES_PER_PIXEL: u32 = 100;
+const DEFAULT_MAX_DEPTH: u32 = 50;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Dimensions<T: Copy + Clone + PartialEq> {
@@ -34,6 +35,7 @@ pub struct Viewport {
     p00_loc: Vec3<f64>,
     samples_per_pixel: u32,
     pixel_samples_scale: f64,
+    max_depth: u32,
 }
 
 impl Default for Viewport {
@@ -45,6 +47,7 @@ impl Default for Viewport {
             Vec3::new(0.0, 0.0, 0.0),
             DEFAULT_FOCAL_LENGTH,
             DEFAULT_SAMPLES_PER_PIXEL,
+            DEFAULT_MAX_DEPTH,
         )
     }
 }
@@ -57,6 +60,7 @@ impl Viewport {
         camera: Vec3<f64>,
         focal_length: f64,
         samples_per_pixel: u32,
+        max_depth: u32,
     ) -> Self {
         let img_height: u32 = if (img_width as f64 / target_aspect_ratio) < 1.0 {
             1
@@ -89,6 +93,7 @@ impl Viewport {
             p00_loc,
             samples_per_pixel,
             pixel_samples_scale: 1.0 / samples_per_pixel as f64,
+            max_depth,
         }
     }
 
@@ -122,5 +127,9 @@ impl Viewport {
 
     pub fn pixel_samples_scale(&self) -> f64 {
         self.pixel_samples_scale
+    }
+
+    pub fn max_depth(&self) -> u32 {
+        self.max_depth
     }
 }

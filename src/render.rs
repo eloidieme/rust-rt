@@ -3,8 +3,13 @@ use std::io::{BufWriter, StdoutLock, Write};
 use indicatif::ProgressIterator;
 
 use crate::{
-    hittable::Hittable, hittable_list::HittableList, interval::Interval, ray::Ray,
-    utils::random_offset_vector, vec3::Vec3, viewport::Viewport,
+    hittable::Hittable,
+    hittable_list::HittableList,
+    interval::Interval,
+    ray::Ray,
+    utils::{random_offset_vector, random_vector_on_hemisphere},
+    vec3::Vec3,
+    viewport::Viewport,
 };
 
 fn write_color(color: Vec3<f64>, handle: &mut BufWriter<StdoutLock<'_>>) {
@@ -14,15 +19,15 @@ fn write_color(color: Vec3<f64>, handle: &mut BufWriter<StdoutLock<'_>>) {
     writeln!(handle, "{ir} {ig} {ib}").unwrap();
 }
 
-fn ray_color(ray: &Ray, world: &HittableList) -> Vec3<f64> {
+fn ray_color(ray: &Ray, depth: u32, world: &HittableList) -> Vec3<f64> {
+    if depth <= 0 {
+        return Vec3::default();
+    }
+
     // Sphere intersection
-    if let Some(rec) = world.hit(ray, Interval::new(0.0, f64::INFINITY)) {
-        let normal: Vec3<f64> = rec.normal;
-        return Vec3::new(
-            0.5 * (normal.x() + 1.0),
-            0.5 * (normal.y() + 1.0),
-            0.5 * (normal.z() + 1.0),
-        );
+    if let Some(rec) = world.hit(ray, Interval::new(0.001, f64::INFINITY)) {
+        let direction: Vec3<f64> = random_vector_on_hemisphere(rec.normal);
+        return ray_color(&Ray::new(ray.at(rec.t), direction), depth - 1, world) * 0.5;
     }
 
     // Background
@@ -51,7 +56,7 @@ pub fn render(handle: &mut BufWriter<StdoutLock<'_>>, viewport: &Viewport, world
                     + (viewport.delta_x() * (i as f64 + offset.x()))
                     + (viewport.delta_y() * (j as f64 + offset.y()));
                 let r: Ray = Ray::new(viewport.camera(), pji - viewport.camera());
-                color = color + ray_color(&r, &world);
+                color = color + ray_color(&r, viewport.max_depth(), &world);
             }
             color = color * viewport.pixel_samples_scale();
             write_color(color, handle);
