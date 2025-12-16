@@ -6,6 +6,7 @@ const DEFAULT_IMG_WIDTH: u32 = 1280;
 const DEFAULT_VIEWPORT_WIDTH: f64 = 3.5;
 const DEFAULT_ASPECT_RATIO: f64 = 16.0 / 9.0;
 const DEFAULT_FOCAL_LENGTH: f64 = 1.0;
+const DEFAULT_SAMPLES_PER_PIXEL: u32 = 100;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Dimensions<T: Copy + Clone + PartialEq> {
@@ -31,6 +32,8 @@ pub struct Viewport {
     delta_y: Vec3<f64>,
     camera: Vec3<f64>,
     p00_loc: Vec3<f64>,
+    samples_per_pixel: u32,
+    pixel_samples_scale: f64,
 }
 
 impl Default for Viewport {
@@ -41,6 +44,7 @@ impl Default for Viewport {
             DEFAULT_VIEWPORT_WIDTH,
             Vec3::new(0.0, 0.0, 0.0),
             DEFAULT_FOCAL_LENGTH,
+            DEFAULT_SAMPLES_PER_PIXEL,
         )
     }
 }
@@ -52,6 +56,7 @@ impl Viewport {
         viewport_width: f64,
         camera: Vec3<f64>,
         focal_length: f64,
+        samples_per_pixel: u32,
     ) -> Self {
         let img_height: u32 = if (img_width as f64 / target_aspect_ratio) < 1.0 {
             1
@@ -82,6 +87,8 @@ impl Viewport {
             delta_y,
             camera,
             p00_loc,
+            samples_per_pixel,
+            pixel_samples_scale: 1.0 / samples_per_pixel as f64,
         }
     }
 
@@ -107,5 +114,13 @@ impl Viewport {
 
     pub fn viewport_dims(&self) -> Dimensions<f64> {
         self.viewport_dims
+    }
+
+    pub fn samples_per_pixel(&self) -> u32 {
+        self.samples_per_pixel
+    }
+
+    pub fn pixel_samples_scale(&self) -> f64 {
+        self.pixel_samples_scale
     }
 }

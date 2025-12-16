@@ -3,14 +3,14 @@ use std::io::{BufWriter, StdoutLock, Write};
 use indicatif::ProgressIterator;
 
 use crate::{
-    hittable::Hittable, hittable_list::HittableList, interval::Interval, ray::Ray, vec3::Vec3,
-    viewport::Viewport,
+    hittable::Hittable, hittable_list::HittableList, interval::Interval, ray::Ray,
+    utils::random_offset_vector, vec3::Vec3, viewport::Viewport,
 };
 
 fn write_color(color: Vec3<f64>, handle: &mut BufWriter<StdoutLock<'_>>) {
-    let ir: u8 = (255.999 * color.x()) as u8;
-    let ig: u8 = (255.999 * color.y()) as u8;
-    let ib: u8 = (255.999 * color.z()) as u8;
+    let ir: u8 = (255.999 * color.x().clamp(0.0, 0.999)) as u8;
+    let ig: u8 = (255.999 * color.y().clamp(0.0, 0.999)) as u8;
+    let ib: u8 = (255.999 * color.z().clamp(0.0, 0.999)) as u8;
     writeln!(handle, "{ir} {ig} {ib}").unwrap();
 }
 
@@ -44,10 +44,16 @@ pub fn render(handle: &mut BufWriter<StdoutLock<'_>>, viewport: &Viewport, world
     for j in (0..viewport.img_dims().height()).progress() {
         for i in 0..viewport.img_dims().width() {
             // (row=j, col=i) represents a single pixel on the screen
-            let pji =
-                viewport.p00_loc() + viewport.delta_x() * i as f64 + viewport.delta_y() * j as f64;
-            let r: Ray = Ray::new(viewport.camera(), pji - viewport.camera());
-            let color: Vec3<f64> = ray_color(&r, &world);
+            let mut color: Vec3<f64> = Vec3::default();
+            for _ in 0..viewport.samples_per_pixel() {
+                let offset = random_offset_vector();
+                let pji = viewport.p00_loc()
+                    + (viewport.delta_x() * (i as f64 + offset.x()))
+                    + (viewport.delta_y() * (j as f64 + offset.y()));
+                let r: Ray = Ray::new(viewport.camera(), pji - viewport.camera());
+                color = color + ray_color(&r, &world);
+            }
+            color = color * viewport.pixel_samples_scale();
             write_color(color, handle);
         }
     }
