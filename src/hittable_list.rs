@@ -13,8 +13,9 @@ pub struct HittableList {
 
 impl HittableList {
     pub fn new() -> Self {
-        let hittables: Vec<Box<_>> = Vec::new();
-        HittableList { hittables }
+        HittableList {
+            hittables: Vec::new(),
+        }
     }
 
     pub fn add<T: Hittable + 'static>(&mut self, hittable: T) {
@@ -27,8 +28,8 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, ray: &Ray, interval: Interval) -> Option<HitRecord> {
-        let mut current_interval: Interval = interval;
+    fn hit(&self, ray: &Ray, bounds: Interval) -> Option<HitRecord> {
+        let mut current_interval: Interval = bounds;
         let mut closest_hit: Option<HitRecord> = None;
 
         for hittable in &self.hittables {

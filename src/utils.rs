@@ -4,7 +4,7 @@ use std::f64::consts::PI;
 
 use rand::Rng;
 
-use crate::vec3::{Vec3, dot};
+use crate::vec3::Vec3;
 
 pub fn degrees_to_radians(angle: f64) -> f64 {
     angle * PI / 180.0
@@ -23,12 +23,12 @@ pub fn random_float(min: f64, max: f64) -> f64 {
     rng.random_range(min..max)
 }
 
-pub fn random_offset_vector() -> Vec3<f64> {
+pub fn random_offset_vector() -> Vec3 {
     Vec3::new(random_float(-0.5, 0.5), random_float(-0.5, 0.5), 0.0)
 }
 
-pub fn random_unit_vector() -> Vec3<f64> {
-    let mut result: Vec3<f64> = Vec3::new(
+pub fn random_unit_vector() -> Vec3 {
+    let mut result: Vec3 = Vec3::new(
         random_float(-1.0, 1.0),
         random_float(-1.0, 1.0),
         random_float(-1.0, 1.0),
@@ -42,15 +42,19 @@ pub fn random_unit_vector() -> Vec3<f64> {
         );
     }
 
-    result / result.length()
+    result.unit_vector()
 }
 
-pub fn random_vector_on_hemisphere(normal: Vec3<f64>) -> Vec3<f64> {
+pub fn random_vector_on_hemisphere(normal: Vec3) -> Vec3 {
     let on_unit_sphere = random_unit_vector();
 
-    if dot(on_unit_sphere, normal) < 0.0 {
+    if Vec3::dot(on_unit_sphere, normal) < 0.0 {
         -on_unit_sphere
     } else {
         on_unit_sphere
     }
+}
+
+pub fn reflect(incident: Vec3, normal: Vec3) -> Vec3 {
+    incident - normal * 2.0 * Vec3::dot(incident, normal)
 }

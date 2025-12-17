@@ -1,12 +1,27 @@
-use crate::{interval::Interval, ray::Ray, vec3::Vec3};
+use std::rc::Rc;
 
-#[derive(Debug, Default)]
+use crate::{interval::Interval, material::Material, ray::Ray, vec3::Vec3};
+
 pub struct HitRecord {
     pub t: f64,
-    pub normal: Vec3<f64>,
+    pub p: Vec3,
+    pub normal: Vec3,
+    pub material: Rc<dyn Material>,
     pub front_face: bool,
 }
 
+impl HitRecord {
+    pub fn set_face_normal(&mut self, r: &Ray, normal: Vec3) {
+        if (Vec3::dot(normal, r.direction())).is_sign_positive() {
+            self.front_face = false;
+            self.normal = -normal;
+        } else {
+            self.normal = normal;
+            self.front_face = true;
+        }
+    }
+}
+
 pub trait Hittable {
-    fn hit(&self, ray: &Ray, interval: Interval) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, bounds: Interval) -> Option<HitRecord>;
 }
