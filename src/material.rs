@@ -2,7 +2,7 @@ use crate::{
     color::Color,
     hittable::HitRecord,
     ray::Ray,
-    utils::{random_unit_vector, reflect, refract},
+    utils::{random_float, random_unit_vector, reflect, refract},
     vec3::Vec3,
 };
 
@@ -82,6 +82,12 @@ impl Dielectric {
     pub fn new(refraction_index: f64) -> Self {
         Self { refraction_index }
     }
+
+    fn reflectance(&self, cosine: f64, refraction_index: f64) -> f64 {
+        let mut r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
+        r0 = r0 * r0;
+        r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+    }
 }
 
 impl Material for Dielectric {
@@ -97,12 +103,13 @@ impl Material for Dielectric {
         let cos_theta = f64::min(Vec3::dot(-unit_direction, rec.normal), 1.0);
         let sin_theta = f64::sqrt(1.0 - cos_theta * cos_theta);
 
-        let cannot_refract = self.refraction_index * sin_theta > 1.0;
-        let direction = if cannot_refract {
-            reflect(unit_direction, rec.normal)
-        } else {
-            refract(unit_direction, rec.normal, ri)
-        };
+        let cannot_refract = ri * sin_theta > 1.0;
+        let direction =
+            if cannot_refract || self.reflectance(cos_theta, ri) > random_float(0.0, 1.0) {
+                reflect(unit_direction, rec.normal)
+            } else {
+                refract(unit_direction, rec.normal, ri)
+            };
 
         let scattered = Ray::new(rec.p, direction);
 
