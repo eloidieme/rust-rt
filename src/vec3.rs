@@ -2,10 +2,13 @@ use std::{fmt, ops};
 
 use crate::common;
 
+/// Alias for Vec3 representing a point in 3D space.
 pub type Point3 = Vec3;
+/// Alias for Vec3 representing an RGB color.
 pub type Color = Vec3;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// A 3-dimensional vector.
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -19,32 +22,39 @@ impl Default for Vec3 {
 }
 
 impl Vec3 {
+    /// Creates a new Vec3 with coordinates x, y, z.
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
     }
 
+    /// Returns the squared length of the vector.
     pub fn length_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
+    /// Returns the length (magnitude) of the vector.
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
 
+    /// Returns a unit vector in the direction of this vector.
     pub fn unit_vector(&self) -> Vec3 {
         *self / self.length()
     }
 
+    /// Checks if the vector is close to zero in all dimensions.
     pub fn near_zero(&self) -> bool {
         let s = 1e-8;
         self.x.abs() < s && self.y.abs() < s && self.z.abs() < s
     }
 
+    /// Computes the dot product with another vector.
     #[inline]
     pub fn dot(&self, rhs: Vec3) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
+    /// Computes the cross product with another vector.
     pub fn cross(&self, rhs: Vec3) -> Vec3 {
         Vec3::new(
             self.y * rhs.z - rhs.y * self.z,
@@ -53,10 +63,12 @@ impl Vec3 {
         )
     }
 
+    /// Reflects the vector around a normal.
     pub fn reflect(&self, normal: Vec3) -> Vec3 {
         *self - 2.0 * self.dot(normal) * normal
     }
 
+    /// Refracts the vector through a surface with normal `normal` and refractive index ratio `etai_over_etat`.
     pub fn refract(&self, normal: Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta = f64::min(-self.dot(normal), 1.0);
         let r_out_perp = etai_over_etat * (*self + cos_theta * normal);

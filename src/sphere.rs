@@ -8,6 +8,7 @@ use crate::{
     vec3::Vec3,
 };
 
+/// A sphere object in the scene.
 pub struct Sphere {
     center: Vec3,
     radius: f64,
@@ -15,6 +16,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
+    /// Creates a new Sphere with a center, radius, and material.
     pub fn new(center: Vec3, radius: f64, material: Arc<dyn Material + Send + Sync>) -> Self {
         Self {
             center,

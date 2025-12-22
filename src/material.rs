@@ -6,21 +6,26 @@ use crate::{
 };
 
 #[derive(Debug)]
+/// Result of a ray scattering off a material.
 pub struct ScatteredRay {
     pub attenuation: Color,
     pub scattered: Ray,
 }
 
+/// Trait for materials that can scatter rays.
 pub trait Material {
+    /// Scatters an incoming ray.
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatteredRay>;
 }
 
 #[derive(Debug)]
+/// A diffuse material (matte).
 pub struct Lambertian {
     albedo: Color,
 }
 
 impl Lambertian {
+    /// Creates a new Lambertian material with the given albedo.
     pub fn new(albedo: Color) -> Self {
         Self { albedo }
     }
@@ -43,12 +48,14 @@ impl Material for Lambertian {
 }
 
 #[derive(Debug)]
+/// A metallic material.
 pub struct Metal {
     albedo: Color,
     fuzz: f64,
 }
 
 impl Metal {
+    /// Creates a new Metal material with albedo and fuzziness.
     pub fn new(albedo: Color, fuzz: f64) -> Self {
         Self {
             albedo,
@@ -74,11 +81,13 @@ impl Material for Metal {
 }
 
 #[derive(Debug)]
+/// A dielectric material (glass, water, etc.).
 pub struct Dielectric {
     refraction_ratio: f64,
 }
 
 impl Dielectric {
+    /// Creates a new Dielectric material with the given refractive index.
     pub fn new(refraction_ratio: f64) -> Self {
         Self { refraction_ratio }
     }
