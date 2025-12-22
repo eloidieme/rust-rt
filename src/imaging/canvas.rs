@@ -25,14 +25,6 @@ impl Canvas {
         }
     }
 
-    #[allow(dead_code)]
-    pub fn set_pixel(&mut self, x: u32, y: u32, color: Color) {
-        let index = (y * self.width + x) as usize;
-        if index < self.pixels.len() {
-            self.pixels[index] = color;
-        }
-    }
-
     pub fn pixels_mut(&mut self) -> &mut [Color] {
         &mut self.pixels
     }

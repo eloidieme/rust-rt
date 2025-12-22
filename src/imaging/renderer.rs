@@ -49,7 +49,7 @@ impl Renderer {
                         let v = r_j / (height as f64);
 
                         let ray = camera.get_ray(u, v);
-                        pixel_color = pixel_color + self.ray_color(&ray, self.max_depth, world);
+                        pixel_color += self.ray_color(&ray, self.max_depth, world);
                     }
 
                     let scale = 1.0 / self.samples_per_pixel as f64;
