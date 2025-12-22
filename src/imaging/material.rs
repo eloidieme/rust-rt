@@ -1,8 +1,8 @@
 use crate::{
-    common,
     geometry::hittable::HitRecord,
     math::{
         ray::Ray,
+        utils,
         vec3::{Color, Vec3},
     },
 };
@@ -115,7 +115,7 @@ impl Material for Dielectric {
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
 
         let direction = if cannot_refract
-            || Self::reflectance(cos_theta, refraction_ratio) > common::random()
+            || Self::reflectance(cos_theta, refraction_ratio) > utils::random()
         {
             unit_direction.reflect(rec.normal)
         } else {

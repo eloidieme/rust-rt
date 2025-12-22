@@ -1,0 +1,55 @@
+width: 1200
+aspect_ratio: 1.777
+camera:
+  look_from: { x: 3.0, y: 1.5, z: 2.0 }
+  look_at: { x: 0.0, y: 0.0, z: 0.0 }
+  vup: { x: 0.0, y: 1.0, z: 0.0 }
+  fov: 50.0
+  defocus_angle: 0.1
+  focus_dist: 3.5
+background:
+  type: VerticalGradient
+  top: { x: 1.0, y: 0.4, z: 0.2 }
+  bottom: { x: 1.0, y: 0.8, z: 0.3 }
+objects:
+  # Ground
+  - type: Sphere
+    center: { x: 0.0, y: -100.5, z: 0.0 }
+    radius: 100.0
+    material:
+      type: Lambertian
+      albedo: { x: 0.3, y: 0.2, z: 0.1 }
+
+  # Center glass sphere
+  - type: Sphere
+    center: { x: 0.0, y: 0.0, z: 0.0 }
+    radius: 0.5
+    material:
+      type: Dielectric
+      index: 1.5
+
+  # Left metallic sphere
+  - type: Sphere
+    center: { x: -1.2, y: 0.0, z: -0.5 }
+    radius: 0.5
+    material:
+      type: Metal
+      albedo: { x: 0.9, y: 0.5, z: 0.3 }
+      fuzz: 0.0
+
+  # Right diffuse sphere
+  - type: Sphere
+    center: { x: 1.2, y: 0.0, z: 0.5 }
+    radius: 0.5
+    material:
+      type: Lambertian
+      albedo: { x: 0.7, y: 0.3, z: 0.1 }
+
+  # Small foreground sphere
+  - type: Sphere
+    center: { x: 0.5, y: -0.2, z: 1.0 }
+    radius: 0.3
+    material:
+      type: Metal
+      albedo: { x: 0.8, y: 0.8, z: 0.9 }
+      fuzz: 0.3

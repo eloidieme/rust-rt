@@ -1,13 +1,15 @@
 use std::sync::Arc;
 
 use crate::{
-    common,
     geometry::{hittable_list::HittableList, sphere::Sphere},
     imaging::{
         camera::Camera,
         material::{Dielectric, Lambertian, Material, Metal},
     },
-    math::vec3::{Color, Vec3},
+    math::{
+        utils,
+        vec3::{Color, Vec3},
+    },
 };
 
 /// Generates a random scene similar to the cover of "Ray Tracing in One Weekend".
@@ -23,11 +25,11 @@ pub fn random_book_scene(aspect_ratio: f64) -> (HittableList, Camera) {
 
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat = common::random();
+            let choose_mat = utils::random();
             let center = Vec3::new(
-                a as f64 + 0.9 * common::random(),
+                a as f64 + 0.9 * utils::random(),
                 0.2,
-                b as f64 + 0.9 * common::random(),
+                b as f64 + 0.9 * utils::random(),
             );
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
@@ -40,7 +42,7 @@ pub fn random_book_scene(aspect_ratio: f64) -> (HittableList, Camera) {
                 } else if choose_mat < 0.95 {
                     // Metal
                     let albedo = Color::random_range(0.5, 1.0);
-                    let fuzz = common::random_range(0.0, 0.5);
+                    let fuzz = utils::random_range(0.0, 0.5);
                     sphere_material = Arc::new(Metal::new(albedo, fuzz));
                 } else {
                     // Glass

@@ -1,11 +1,13 @@
 use std::{fmt, ops};
 
-use crate::common;
+use serde::Deserialize;
+
+use crate::math::utils;
 
 pub type Point3 = Vec3;
 pub type Color = Vec3;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -66,14 +68,14 @@ impl Vec3 {
     }
 
     pub fn random() -> Self {
-        Vec3::new(common::random(), common::random(), common::random())
+        Vec3::new(utils::random(), utils::random(), utils::random())
     }
 
     pub fn random_range(min: f64, max: f64) -> Self {
         Vec3::new(
-            common::random_range(min, max),
-            common::random_range(min, max),
-            common::random_range(min, max),
+            utils::random_range(min, max),
+            utils::random_range(min, max),
+            utils::random_range(min, max),
         )
     }
 
@@ -93,8 +95,8 @@ impl Vec3 {
     pub fn random_in_unit_disk() -> Self {
         loop {
             let p = Vec3::new(
-                common::random_range(-1.0, 1.0),
-                common::random_range(-1.0, 1.0),
+                utils::random_range(-1.0, 1.0),
+                utils::random_range(-1.0, 1.0),
                 0.0,
             );
             if p.length_squared() < 1.0 {
@@ -105,8 +107,8 @@ impl Vec3 {
 
     pub fn random_offset_vector() -> Vec3 {
         Vec3::new(
-            common::random_range(-0.5, 0.5),
-            common::random_range(-0.5, 0.5),
+            utils::random_range(-0.5, 0.5),
+            utils::random_range(-0.5, 0.5),
             0.0,
         )
     }
