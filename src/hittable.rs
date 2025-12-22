@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::{interval::Interval, material::Material, ray::Ray, vec3::Vec3};
 
@@ -6,18 +6,21 @@ pub struct HitRecord {
     pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
-    pub material: Rc<dyn Material>,
+    pub material: Arc<dyn Material>,
     pub front_face: bool,
 }
 
 impl HitRecord {
-    pub fn set_face_normal(&mut self, r: &Ray, normal: Vec3) {
-        if (normal.dot(r.direction())).is_sign_positive() {
-            self.front_face = false;
-            self.normal = -normal;
-        } else {
-            self.normal = normal;
-            self.front_face = true;
+    pub fn new(p: Vec3, normal: Vec3, t: f64, ray: &Ray, material: Arc<dyn Material>) -> Self {
+        let front_face = ray.direction.dot(normal) < 0.0;
+        let normal = if front_face { normal } else { -normal };
+
+        HitRecord {
+            t,
+            p,
+            normal,
+            material,
+            front_face,
         }
     }
 }

@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use crate::{
     hittable::{HitRecord, Hittable},
     interval::Interval,
@@ -7,22 +5,17 @@ use crate::{
 };
 use std::boxed::Box;
 
+#[derive(Default)]
 pub struct HittableList {
-    hittables: Vec<Box<dyn Hittable>>,
+    hittables: Vec<Box<dyn Hittable + Send + Sync>>,
 }
 
 impl HittableList {
-    pub fn new() -> Self {
-        HittableList {
-            hittables: Vec::new(),
-        }
-    }
-
-    pub fn add<T: Hittable + 'static>(&mut self, hittable: T) {
+    pub fn add<T: Hittable + 'static + Send + Sync>(&mut self, hittable: T) {
         self.hittables.push(Box::new(hittable));
     }
 
-    pub fn clear(&mut self) {
+    pub fn _clear(&mut self) {
         self.hittables.clear();
     }
 }

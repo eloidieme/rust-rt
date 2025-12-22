@@ -166,7 +166,7 @@ impl Camera {
         }
 
         // Background
-        let normalized_direction: Vec3 = ray.direction() / ray.direction().length();
+        let normalized_direction: Vec3 = ray.direction.unit_vector();
         let white: Vec3 = Vec3::new(1.0, 1.0, 1.0);
         let blue: Vec3 = Vec3::new(0.5, 0.7, 1.0);
         let a: f64 = 0.5 * (normalized_direction.y + 1.0);

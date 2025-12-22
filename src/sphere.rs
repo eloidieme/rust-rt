@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::{
     hittable::{HitRecord, Hittable},
@@ -11,61 +11,45 @@ use crate::{
 pub struct Sphere {
     center: Vec3,
     radius: f64,
-    material: Rc<dyn Material>,
+    material: Arc<dyn Material + Send + Sync>,
 }
 
 impl Sphere {
-    pub fn new<M: Material + 'static>(center: Vec3, radius: f64, material: M) -> Self {
+    pub fn new(center: Vec3, radius: f64, material: Arc<dyn Material + Send + Sync>) -> Self {
         Self {
             center,
             radius,
-            material: Rc::new(material),
+            material,
         }
     }
 }
 
 impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, bounds: Interval) -> Option<HitRecord> {
-        let oc: Vec3 = self.center - ray.origin();
-        let a: f64 = ray.direction().dot(ray.direction());
-        let h: f64 = oc.dot(ray.direction());
+        let oc: Vec3 = self.center - ray.origin;
+        let a: f64 = ray.direction.dot(ray.direction);
+        let h: f64 = oc.dot(ray.direction);
         let c: f64 = oc.dot(oc) - self.radius * self.radius;
 
         let discriminant: f64 = h * h - a * c;
-
         if discriminant < 0.0 {
             return None;
         }
 
-        let t;
-        let p;
-
         let sqrtd: f64 = discriminant.sqrt();
 
-        let t1 = (h - sqrtd) / a;
-        let t2 = (h + sqrtd) / a;
+        let mut root = (h - sqrtd) / a;
 
-        if bounds.surrounds(t1) {
-            t = t1;
-            p = ray.at(t1);
-        } else if bounds.surrounds(t2) {
-            t = t2;
-            p = ray.at(t2);
-        } else {
-            return None;
+        if !bounds.surrounds(root) {
+            root = (h + sqrtd) / a;
+            if !bounds.surrounds(root) {
+                return None;
+            }
         }
 
-        let mut rec = HitRecord {
-            t,
-            p,
-            normal: Vec3::default(),
-            material: self.material.clone(),
-            front_face: false,
-        };
+        let p = ray.at(root);
+        let normal = (p - self.center) / self.radius;
 
-        let normal: Vec3 = (rec.p - self.center) / self.radius;
-        rec.set_face_normal(ray, normal);
-
-        return Some(rec);
+        Some(HitRecord::new(p, normal, root, ray, self.material.clone()))
     }
 }

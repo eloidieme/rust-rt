@@ -29,11 +29,33 @@ impl Interval {
         Interval { min, max }
     }
 
+    pub fn size(&self) -> f64 {
+        self.max - self.min
+    }
+
     pub fn contains(&self, x: f64) -> bool {
         x >= self.min && x <= self.max
     }
 
     pub fn surrounds(&self, x: f64) -> bool {
         x > self.min && x < self.max
+    }
+
+    pub fn clamp(&self, x: f64) -> f64 {
+        if x < self.min {
+            return self.min;
+        }
+        if x > self.max {
+            return self.max;
+        }
+        x
+    }
+
+    pub fn expand(&self, delta: f64) -> Interval {
+        Interval::new(self.min - delta, self.max + delta)
+    }
+
+    pub fn merge(_a: Interval, _b: Interval) -> Interval {
+        todo!("Interval::merge is not implemented yet!");
     }
 }
