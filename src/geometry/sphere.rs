@@ -1,19 +1,17 @@
-use std::sync::Arc;
-
 use crate::{
     geometry::hittable::{HitRecord, Hittable},
-    imaging::material::Material,
+    imaging::material::MaterialKind,
     math::{interval::Interval, ray::Ray, vec3::Vec3},
 };
 
 pub struct Sphere {
     center: Vec3,
     radius: f64,
-    material: Arc<dyn Material + Send + Sync>,
+    material: MaterialKind,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f64, material: Arc<dyn Material + Send + Sync>) -> Self {
+    pub fn new(center: Vec3, radius: f64, material: MaterialKind) -> Self {
         Self {
             center,
             radius,

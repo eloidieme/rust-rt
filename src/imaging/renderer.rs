@@ -77,8 +77,8 @@ impl Renderer {
 
         if let Some(rec) = world.hit(ray, Interval::new(0.001, f64::INFINITY)) {
             if let Some(scattered) = rec.material.scatter(ray, &rec) {
-                return self.ray_color(&scattered.scattered, depth - 1, world, background)
-                    * scattered.attenuation;
+                return scattered.attenuation
+                    * self.ray_color(&scattered.scattered, depth - 1, world, background);
             }
             return Color::new(0.0, 0.0, 0.0);
         }

@@ -1,10 +1,8 @@
-use std::sync::Arc;
-
 use crate::{
     geometry::{hittable_list::HittableList, sphere::Sphere},
     imaging::{
         camera::Camera,
-        material::{Dielectric, Lambertian, Material, Metal},
+        material::{Dielectric, Lambertian, MaterialKind, Metal},
     },
     math::{
         utils,
@@ -16,7 +14,7 @@ use crate::{
 pub fn random_book_scene(aspect_ratio: f64) -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
-    let ground_material = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let ground_material = MaterialKind::Lambertian(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     world.add(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -33,20 +31,20 @@ pub fn random_book_scene(aspect_ratio: f64) -> (HittableList, Camera) {
             );
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                let sphere_material: Arc<dyn Material + Send + Sync>;
+                let sphere_material: MaterialKind;
 
                 if choose_mat < 0.8 {
                     // Diffuse
                     let albedo = Color::random() * Color::random();
-                    sphere_material = Arc::new(Lambertian::new(albedo));
+                    sphere_material = MaterialKind::Lambertian(Lambertian::new(albedo));
                 } else if choose_mat < 0.95 {
                     // Metal
                     let albedo = Color::random_range(0.5, 1.0);
                     let fuzz = utils::random_range(0.0, 0.5);
-                    sphere_material = Arc::new(Metal::new(albedo, fuzz));
+                    sphere_material = MaterialKind::Metal(Metal::new(albedo, fuzz));
                 } else {
                     // Glass
-                    sphere_material = Arc::new(Dielectric::new(1.5));
+                    sphere_material = MaterialKind::Dielectric(Dielectric::new(1.5));
                 }
 
                 world.add(Sphere::new(center, 0.2, sphere_material));
@@ -54,13 +52,13 @@ pub fn random_book_scene(aspect_ratio: f64) -> (HittableList, Camera) {
         }
     }
 
-    let material_1 = Arc::new(Dielectric::new(1.5));
+    let material_1 = MaterialKind::Dielectric(Dielectric::new(1.5));
     world.add(Sphere::new(Vec3::new(0.0, 1.0, 0.0), 1.0, material_1));
 
-    let material_2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let material_2 = MaterialKind::Lambertian(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
     world.add(Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, material_2));
 
-    let material_3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    let material_3 = MaterialKind::Metal(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
     world.add(Sphere::new(Vec3::new(4.0, 1.0, 0.0), 1.0, material_3));
 
     let camera = Camera::builder()

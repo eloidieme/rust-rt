@@ -1,12 +1,11 @@
 use std::fs;
-use std::sync::Arc;
 
 use crate::{
     geometry::{hittable_list::HittableList, sphere::Sphere},
     imaging::{
         camera::Camera,
         canvas::Canvas,
-        material::{Dielectric, Lambertian, Material, Metal},
+        material::{Dielectric, Lambertian, MaterialKind, Metal},
         renderer::Renderer,
     },
     scene::{Background, MaterialConfig, ObjectConfig, SceneConfig},
@@ -40,12 +39,16 @@ impl Engine {
                     radius,
                     material,
                 } => {
-                    let mat: Arc<dyn Material + Send + Sync> = match material {
-                        MaterialConfig::Lambertian { albedo } => Arc::new(Lambertian::new(albedo)),
-                        MaterialConfig::Metal { albedo, fuzz } => {
-                            Arc::new(Metal::new(albedo, fuzz))
+                    let mat = match material {
+                        MaterialConfig::Lambertian { albedo } => {
+                            MaterialKind::Lambertian(Lambertian::new(albedo))
                         }
-                        MaterialConfig::Dielectric { index } => Arc::new(Dielectric::new(index)),
+                        MaterialConfig::Metal { albedo, fuzz } => {
+                            MaterialKind::Metal(Metal::new(albedo, fuzz))
+                        }
+                        MaterialConfig::Dielectric { index } => {
+                            MaterialKind::Dielectric(Dielectric::new(index))
+                        }
                     };
 
                     world.add(Sphere::new(center, radius, mat));

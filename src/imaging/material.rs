@@ -14,15 +14,33 @@ pub struct ScatteredRay {
     pub scattered: Ray,
 }
 
+/// Enum-based material dispatch for better performance.
+#[derive(Debug, Clone)]
+pub enum MaterialKind {
+    Lambertian(Lambertian),
+    Metal(Metal),
+    Dielectric(Dielectric),
+}
+
+impl MaterialKind {
+    pub fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatteredRay> {
+        match self {
+            MaterialKind::Lambertian(m) => m.scatter(r_in, rec),
+            MaterialKind::Metal(m) => m.scatter(r_in, rec),
+            MaterialKind::Dielectric(m) => m.scatter(r_in, rec),
+        }
+    }
+}
+
 /// Trait for materials that can scatter rays.
 pub trait Material {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatteredRay>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 /// A diffuse material (matte).
 pub struct Lambertian {
-    albedo: Color,
+    pub albedo: Color,
 }
 
 impl Lambertian {
@@ -47,11 +65,11 @@ impl Material for Lambertian {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 /// A metallic material.
 pub struct Metal {
-    albedo: Color,
-    fuzz: f64,
+    pub albedo: Color,
+    pub fuzz: f64,
 }
 
 impl Metal {
@@ -80,10 +98,10 @@ impl Material for Metal {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 /// A dielectric material (glass, water, etc.).
 pub struct Dielectric {
-    refraction_ratio: f64,
+    pub refraction_ratio: f64,
 }
 
 impl Dielectric {
@@ -114,13 +132,12 @@ impl Material for Dielectric {
 
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
 
-        let direction = if cannot_refract
-            || Self::reflectance(cos_theta, refraction_ratio) > utils::random()
-        {
-            unit_direction.reflect(rec.normal)
-        } else {
-            unit_direction.refract(rec.normal, refraction_ratio)
-        };
+        let direction =
+            if cannot_refract || Self::reflectance(cos_theta, refraction_ratio) > utils::random() {
+                unit_direction.reflect(rec.normal)
+            } else {
+                unit_direction.refract(rec.normal, refraction_ratio)
+            };
 
         Some(ScatteredRay {
             attenuation,
