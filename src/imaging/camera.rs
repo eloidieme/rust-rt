@@ -1,7 +1,6 @@
 use crate::math::{ray::Ray, vec3::Vec3};
 
 #[derive(Debug, Clone)]
-/// Represents a camera in the scene.
 pub struct Camera {
     center: Vec3,
     pixel00_loc: Vec3,
@@ -13,7 +12,6 @@ pub struct Camera {
 }
 
 impl Camera {
-    /// Creates a new CameraBuilder with default settings.
     pub fn builder() -> CameraBuilder {
         CameraBuilder::default()
     }
@@ -39,7 +37,6 @@ impl Camera {
     }
 }
 
-/// A builder for creating a Camera instance.
 pub struct CameraBuilder {
     aspect_ratio: f64,
     vertical_fov: f64,
@@ -65,50 +62,42 @@ impl Default for CameraBuilder {
 }
 
 impl CameraBuilder {
-    /// Sets the aspect ratio of the camera.
     pub fn aspect_ratio(mut self, ratio: f64) -> Self {
         self.aspect_ratio = ratio;
         self
     }
 
-    /// Sets the vertical field of view in degrees.
     pub fn fov(mut self, vertical_fov: f64) -> Self {
         self.vertical_fov = vertical_fov;
         self
     }
 
-    /// Sets the position the camera is looking from.
     pub fn look_from(mut self, from: Vec3) -> Self {
         self.lookfrom = from;
         self
     }
 
-    /// Sets the position the camera is looking at.
     pub fn look_at(mut self, at: Vec3) -> Self {
         self.lookat = at;
         self
     }
 
-    /// Sets the "up" direction for the camera.
     #[allow(dead_code)]
     pub fn vup(mut self, vup: Vec3) -> Self {
         self.vup = vup;
         self
     }
 
-    /// Sets the defocus angle (blur) for depth of field.
     pub fn defocus_angle(mut self, angle: f64) -> Self {
         self.defocus_angle = angle;
         self
     }
 
-    /// Sets the focus distance.
     pub fn focus_dist(mut self, dist: f64) -> Self {
         self.focus_dist = dist;
         self
     }
 
-    /// Builds the Camera instance.
     pub fn build(self) -> Camera {
         let theta = self.vertical_fov.to_radians();
         let h = (theta / 2.0).tan();

@@ -8,14 +8,12 @@ use crate::{
     math::{interval::Interval, ray::Ray, vec3::Color},
 };
 
-/// Handles the rendering process.
 pub struct Renderer {
     pub samples_per_pixel: u32,
     pub max_depth: u32,
 }
 
 impl Renderer {
-    /// Creates a new Renderer with specified settings.
     pub fn new(samples_per_pixel: u32, max_depth: u32) -> Self {
         Self {
             samples_per_pixel,
@@ -23,7 +21,6 @@ impl Renderer {
         }
     }
 
-    /// Renders the scene to the canvas.
     pub fn render(&self, world: &HittableList, camera: &Camera, canvas: &mut Canvas) {
         let width = canvas.width as usize;
         let height = canvas.height as usize;

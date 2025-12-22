@@ -16,7 +16,6 @@ pub struct ScatteredRay {
 
 /// Trait for materials that can scatter rays.
 pub trait Material {
-    /// Scatters an incoming ray.
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatteredRay>;
 }
 
@@ -27,7 +26,6 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    /// Creates a new Lambertian material with the given albedo.
     pub fn new(albedo: Color) -> Self {
         Self { albedo }
     }
@@ -89,7 +87,6 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
-    /// Creates a new Dielectric material with the given refractive index.
     pub fn new(refraction_ratio: f64) -> Self {
         Self { refraction_ratio }
     }

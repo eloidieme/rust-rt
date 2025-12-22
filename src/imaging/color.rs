@@ -20,7 +20,6 @@ pub fn write_color<T: Write>(color: Color, handle: &mut T) {
     writeln!(handle, "{ir} {ig} {ib}").unwrap();
 }
 
-/// Converts a linear color component to gamma space.
 pub fn linear_to_gamma(linear: f64) -> f64 {
     if linear > 0.0 {
         return linear.sqrt();

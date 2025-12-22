@@ -5,7 +5,6 @@ use crate::{
     math::{interval::Interval, ray::Ray, vec3::Vec3},
 };
 
-/// Records details of a ray-object intersection.
 pub struct HitRecord {
     pub t: f64,
     pub p: Vec3,
@@ -30,8 +29,6 @@ impl HitRecord {
     }
 }
 
-/// Trait for objects that can be hit by a ray.
 pub trait Hittable {
-    /// Determines if a ray hits the object within the given interval.
     fn hit(&self, ray: &Ray, bounds: Interval) -> Option<HitRecord>;
 }

@@ -12,7 +12,6 @@ pub struct Canvas {
 }
 
 impl Canvas {
-    /// Creates a new Canvas with the specified width and aspect ratio.
     pub fn new(width: u32, aspect_ratio: f64) -> Self {
         let mut height = (width as f64 / aspect_ratio) as u32;
         if height < 1 {
@@ -26,7 +25,6 @@ impl Canvas {
         }
     }
 
-    /// Sets the color of a pixel at (x, y).
     #[allow(dead_code)]
     pub fn set_pixel(&mut self, x: u32, y: u32, color: Color) {
         let index = (y * self.width + x) as usize;
@@ -35,12 +33,10 @@ impl Canvas {
         }
     }
 
-    /// Returns a mutable slice of the pixels.
     pub fn pixels_mut(&mut self) -> &mut [Color] {
         &mut self.pixels
     }
 
-    /// Saves the canvas as a PNG file.
     pub fn save_png<P: AsRef<Path>>(&self, path: P) -> Result<(), image::ImageError> {
         let mut img = RgbImage::new(self.width, self.height);
 
