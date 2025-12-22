@@ -1,6 +1,9 @@
 use std::io::Write;
 
-use crate::{utils::linear_to_gamma, vec3::Vec3};
+use crate::{
+    utils::{linear_to_gamma, random_float},
+    vec3::Vec3,
+};
 
 pub type Color = Vec3;
 
@@ -13,4 +16,12 @@ pub fn write_color<T: Write>(color: Color, handle: &mut T) {
     let ig: u8 = (255.999 * g) as u8;
     let ib: u8 = (255.999 * b) as u8;
     writeln!(handle, "{ir} {ig} {ib}").unwrap();
+}
+
+pub fn random_color(min: f64, max: f64) -> Color {
+    Vec3::new(
+        random_float(min, max),
+        random_float(min, max),
+        random_float(min, max),
+    )
 }

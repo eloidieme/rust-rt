@@ -13,10 +13,11 @@ use std::io::{self, BufWriter};
 
 use crate::{
     camera::Camera,
-    color::Color,
+    color::{Color, random_color},
     hittable_list::HittableList,
     material::{Dielectric, Lambertian, Metal},
     sphere::Sphere,
+    utils::random_float,
     vec3::Vec3,
 };
 
@@ -26,22 +27,45 @@ fn main() {
 
     let mut world = HittableList::new();
 
-    let material_ground = Lambertian::new(Color::new(0.8, 0.8, 0.0));
-    let material_center = Lambertian::new(Color::new(0.1, 0.2, 0.5));
-    let material_left = Dielectric::new(1.50);
-    let material_bubble = Dielectric::new(1.00 / 1.50);
-    let material_right = Metal::new(Color::new(0.8, 0.6, 0.2), 0.0);
+    let material_ground = Lambertian::new(Color::new(0.5, 0.5, 0.5));
+    world.add(Sphere::new(
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        material_ground,
+    ));
 
-    let sphere_center = Sphere::new(Vec3::new(0.0, 0.0, -1.2), 0.5, material_center);
-    let sphere_left = Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, material_left);
-    let sphere_bubble = Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.4, material_bubble);
-    let sphere_right = Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, material_right);
-    let ground = Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, material_ground);
-    world.add(sphere_center);
-    world.add(sphere_left);
-    world.add(sphere_bubble);
-    world.add(sphere_right);
-    world.add(ground);
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random_float(0.0, 1.0);
+            let center = Vec3::new(
+                a as f64 + 0.9 * random_float(0.0, 1.0),
+                0.2,
+                b as f64 + 0.9 * random_float(0.0, 1.0),
+            );
+
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    let albedo = random_color(0.0, 1.0) * random_color(0.0, 1.0);
+                    world.add(Sphere::new(center, 0.2, Lambertian::new(albedo)));
+                } else if choose_mat < 0.95 {
+                    let albedo = random_color(0.5, 1.0);
+                    let fuzz = random_float(0.0, 0.5);
+                    world.add(Sphere::new(center, 0.2, Metal::new(albedo, fuzz)));
+                } else {
+                    world.add(Sphere::new(center, 0.2, Dielectric::new(1.5)));
+                }
+            }
+        }
+    }
+
+    let material_1 = Dielectric::new(1.50);
+    world.add(Sphere::new(Vec3::new(0.0, 1.0, 0.0), 1.0, material_1));
+
+    let material_2 = Lambertian::new(Vec3::new(0.4, 0.2, 0.1));
+    world.add(Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, material_2));
+
+    let material_3 = Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0);
+    world.add(Sphere::new(Vec3::new(4.0, 1.0, 0.0), 1.0, material_3));
 
     let camera: Camera = Camera::default();
     camera.render(&mut handle, &world);

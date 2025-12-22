@@ -11,16 +11,18 @@ use crate::{
     interval::Interval,
     material::ScatteredRay,
     ray::Ray,
-    utils::{degrees_to_radians, random_offset_vector},
+    utils::{degrees_to_radians, random_in_unit_disk, random_offset_vector},
     vec3::Vec3,
 };
 
 const DEFAULT_IMG_WIDTH: u32 = 1280;
 const DEFAULT_ASPECT_RATIO: f64 = 16.0 / 9.0;
 const DEFAULT_FOCAL_LENGTH: f64 = 1.0;
-const DEFAULT_SAMPLES_PER_PIXEL: u32 = 100;
+const DEFAULT_SAMPLES_PER_PIXEL: u32 = 500;
 const DEFAULT_MAX_DEPTH: u32 = 50;
 const DEFAULT_VERTICAL_FOV: f64 = 20.0;
+const DEFAULT_DEFOCUS_ANGLE: f64 = 0.6;
+const DEFAULT_FOCUS_DIST: f64 = 10.0;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Dimensions<T: Copy + Clone + PartialEq> {
@@ -52,6 +54,9 @@ pub struct Camera {
     pixel_samples_scale: f64,
     max_depth: u32,
     vertical_fov: f64,
+    defocus_angle: f64,
+    defocus_disk_u: Vec3,
+    defocus_disk_v: Vec3,
 }
 
 impl Default for Camera {
@@ -59,12 +64,14 @@ impl Default for Camera {
         Camera::new(
             DEFAULT_ASPECT_RATIO,
             DEFAULT_IMG_WIDTH,
-            Vec3::new(-2.0, 2.0, 1.0),
-            Vec3::new(0.0, 0.0, -1.0),
+            Vec3::new(13.0, 2.0, 3.0),
+            Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
             DEFAULT_SAMPLES_PER_PIXEL,
             DEFAULT_MAX_DEPTH,
             DEFAULT_VERTICAL_FOV,
+            DEFAULT_DEFOCUS_ANGLE,
+            DEFAULT_FOCUS_DIST,
         )
     }
 }
@@ -79,23 +86,25 @@ impl Camera {
         samples_per_pixel: u32,
         max_depth: u32,
         vertical_fov: f64,
+        defocus_angle: f64,
+        focus_dist: f64,
     ) -> Self {
         let img_height: u32 = if (img_width as f64 / target_aspect_ratio) < 1.0 {
             1
         } else {
             (img_width as f64 / target_aspect_ratio) as u32
         };
+
+        let center: Vec3 = lookfrom;
         let actual_aspect_ratio: f64 = img_width as f64 / img_height as f64;
-        let focal_length = (lookfrom - lookat).length();
         let theta = degrees_to_radians(vertical_fov);
         let h = (theta / 2.0).tan();
-        let viewport_height: f64 = 2.0 * h * focal_length;
+        let viewport_height: f64 = 2.0 * h * focus_dist;
         let viewport_width = viewport_height * actual_aspect_ratio;
 
         let w: Vec3 = (lookfrom - lookat).unit_vector();
         let u: Vec3 = Vec3::cross(vup, w).unit_vector();
         let v: Vec3 = Vec3::cross(w, u);
-        let center: Vec3 = lookfrom;
 
         let viewport_x: Vec3 = u * viewport_width;
         let viewport_y: Vec3 = -v * viewport_height;
@@ -103,8 +112,12 @@ impl Camera {
         let delta_x: Vec3 = viewport_x / img_width as f64;
         let delta_y: Vec3 = viewport_y / img_height as f64;
         let viewport_upper_left: Vec3 =
-            center - w * focal_length - viewport_x / 2.0 - viewport_y / 2.0;
+            center - w * focus_dist - viewport_x / 2.0 - viewport_y / 2.0;
         let p00_loc = viewport_upper_left + (delta_x + delta_y) * 0.5;
+
+        let defocus_radius = degrees_to_radians(defocus_angle / 2.0).tan() * focus_dist;
+        let defocus_disk_u = u * defocus_radius;
+        let defocus_disk_v = v * defocus_radius;
 
         Self {
             img_dims: Dimensions {
@@ -125,7 +138,15 @@ impl Camera {
             pixel_samples_scale: 1.0 / samples_per_pixel as f64,
             max_depth,
             vertical_fov,
+            defocus_disk_u,
+            defocus_disk_v,
+            defocus_angle,
         }
+    }
+
+    fn defocus_disk_sample(&self) -> Vec3 {
+        let p: Vec3 = random_in_unit_disk();
+        self.center + (self.defocus_disk_u * p.x()) + (self.defocus_disk_v * p.y())
     }
 
     fn ray_color(&self, ray: &Ray, depth: u32, world: &HittableList) -> Vec3 {
@@ -133,7 +154,6 @@ impl Camera {
             return Vec3::default();
         }
 
-        // Sphere intersection
         if let Some(rec) = world.hit(ray, Interval::new(0.001, f64::INFINITY)) {
             if let Some(ScatteredRay {
                 attenuation,
@@ -172,7 +192,12 @@ impl Camera {
                     let pji = self.p00_loc
                         + (self.delta_x * (i as f64 + offset.x()))
                         + (self.delta_y * (j as f64 + offset.y()));
-                    let r: Ray = Ray::new(self.center, pji - self.center);
+                    let ray_origin = if self.defocus_angle <= 0.0 {
+                        self.center
+                    } else {
+                        self.defocus_disk_sample()
+                    };
+                    let r: Ray = Ray::new(ray_origin, pji - ray_origin);
                     color = color + self.ray_color(&r, self.max_depth, &world);
                 }
                 color = color * self.pixel_samples_scale;
