@@ -1,7 +1,7 @@
 use std::fs;
 
 use crate::{
-    geometry::{hittable_list::HittableList, sphere::Sphere},
+    geometry::{hittable_list::HittableList, sphere::Sphere, triangle::Triangle},
     imaging::{
         camera::Camera,
         canvas::Canvas,
@@ -52,6 +52,26 @@ impl Engine {
                     };
 
                     world.add(Sphere::new(center, radius, mat));
+                }
+                ObjectConfig::Triangle {
+                    v0,
+                    v1,
+                    v2,
+                    material,
+                } => {
+                    let mat = match material {
+                        MaterialConfig::Lambertian { albedo } => {
+                            MaterialKind::Lambertian(Lambertian::new(albedo))
+                        }
+                        MaterialConfig::Metal { albedo, fuzz } => {
+                            MaterialKind::Metal(Metal::new(albedo, fuzz))
+                        }
+                        MaterialConfig::Dielectric { index } => {
+                            MaterialKind::Dielectric(Dielectric::new(index))
+                        }
+                    };
+
+                    world.add(Triangle::new(v0, v1, v2, mat));
                 }
             }
         }

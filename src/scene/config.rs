@@ -35,6 +35,12 @@ pub enum ObjectConfig {
         radius: f64,
         material: MaterialConfig,
     },
+    Triangle {
+        v0: Vec3,
+        v1: Vec3,
+        v2: Vec3,
+        material: MaterialConfig,
+    },
 }
 
 #[derive(Deserialize)]

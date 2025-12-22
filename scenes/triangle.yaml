@@ -1,0 +1,20 @@
+aspect_ratio: 1.777
+camera:
+  look_from: { x: 0.0, y: 0.0, z: 3.0 }
+  look_at: { x: 0.0, y: 0.0, z: 0.0 }
+  vup: { x: 0.0, y: 1.0, z: 0.0 }
+  fov: 40.0
+  defocus_angle: 0.0
+  focus_dist: 3.0
+background:
+  type: VerticalGradient
+  top: { x: 0.5, y: 0.7, z: 1.0 }
+  bottom: { x: 1.0, y: 1.0, z: 1.0 }
+objects:
+  - type: Triangle
+    v0: { x: -1.0, y: -1.0, z: 0.0 }
+    v1: { x: 1.0, y: -1.0, z: 0.0 }
+    v2: { x: 0.0, y: 1.0, z: 0.0 }
+    material:
+      type: Lambertian
+      albedo: { x: 0.5, y: 0.5, z: 0.5 }
