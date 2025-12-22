@@ -12,7 +12,7 @@ pub struct HitRecord {
 
 impl HitRecord {
     pub fn set_face_normal(&mut self, r: &Ray, normal: Vec3) {
-        if (Vec3::dot(normal, r.direction())).is_sign_positive() {
+        if (normal.dot(r.direction())).is_sign_positive() {
             self.front_face = false;
             self.normal = -normal;
         } else {

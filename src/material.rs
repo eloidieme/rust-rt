@@ -1,9 +1,8 @@
 use crate::{
-    color::Color,
+    common::random_float,
     hittable::HitRecord,
     ray::Ray,
-    utils::{random_float, random_unit_vector, reflect, refract},
-    vec3::Vec3,
+    vec3::{Color, Vec3},
 };
 
 #[derive(Debug)]
@@ -29,7 +28,7 @@ impl Lambertian {
 
 impl Material for Lambertian {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord) -> Option<ScatteredRay> {
-        let mut scatter_direction = rec.normal + random_unit_vector();
+        let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
 
         if scatter_direction.near_zero() {
             scatter_direction = rec.normal;
@@ -60,10 +59,10 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatteredRay> {
-        let mut reflected = reflect(r_in.direction(), rec.normal);
-        reflected = reflected.unit_vector() + random_unit_vector() * self.fuzz;
+        let mut reflected = r_in.direction().reflect(rec.normal);
+        reflected = reflected.unit_vector() + Vec3::random_unit_vector() * self.fuzz;
         let scattered = Ray::new(rec.p, reflected);
-        if Vec3::dot(scattered.direction(), rec.normal) > 0.0 {
+        if scattered.direction().dot(rec.normal) > 0.0 {
             Some(ScatteredRay {
                 attenuation: self.albedo,
                 scattered,
@@ -100,15 +99,15 @@ impl Material for Dielectric {
         };
 
         let unit_direction = r_in.direction().unit_vector();
-        let cos_theta = f64::min(Vec3::dot(-unit_direction, rec.normal), 1.0);
+        let cos_theta = f64::min(-unit_direction.dot(rec.normal), 1.0);
         let sin_theta = f64::sqrt(1.0 - cos_theta * cos_theta);
 
         let cannot_refract = ri * sin_theta > 1.0;
         let direction =
             if cannot_refract || self.reflectance(cos_theta, ri) > random_float(0.0, 1.0) {
-                reflect(unit_direction, rec.normal)
+                unit_direction.reflect(rec.normal)
             } else {
-                refract(unit_direction, rec.normal, ri)
+                unit_direction.refract(rec.normal, ri)
             };
 
         let scattered = Ray::new(rec.p, direction);

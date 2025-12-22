@@ -5,14 +5,13 @@ use std::io::{BufWriter, StdoutLock, Write};
 use indicatif::ProgressIterator;
 
 use crate::{
-    color::{Color, write_color},
+    color::write_color,
     hittable::Hittable,
     hittable_list::HittableList,
     interval::Interval,
     material::ScatteredRay,
     ray::Ray,
-    utils::{degrees_to_radians, random_in_unit_disk, random_offset_vector},
-    vec3::Vec3,
+    vec3::{Color, Vec3},
 };
 
 const DEFAULT_IMG_WIDTH: u32 = 1280;
@@ -97,14 +96,14 @@ impl Camera {
 
         let center: Vec3 = lookfrom;
         let actual_aspect_ratio: f64 = img_width as f64 / img_height as f64;
-        let theta = degrees_to_radians(vertical_fov);
+        let theta = vertical_fov.to_radians();
         let h = (theta / 2.0).tan();
         let viewport_height: f64 = 2.0 * h * focus_dist;
         let viewport_width = viewport_height * actual_aspect_ratio;
 
         let w: Vec3 = (lookfrom - lookat).unit_vector();
-        let u: Vec3 = Vec3::cross(vup, w).unit_vector();
-        let v: Vec3 = Vec3::cross(w, u);
+        let u: Vec3 = vup.cross(w).unit_vector();
+        let v: Vec3 = w.cross(u);
 
         let viewport_x: Vec3 = u * viewport_width;
         let viewport_y: Vec3 = -v * viewport_height;
@@ -115,7 +114,7 @@ impl Camera {
             center - w * focus_dist - viewport_x / 2.0 - viewport_y / 2.0;
         let p00_loc = viewport_upper_left + (delta_x + delta_y) * 0.5;
 
-        let defocus_radius = degrees_to_radians(defocus_angle / 2.0).tan() * focus_dist;
+        let defocus_radius = (defocus_angle / 2.0).to_radians().tan() * focus_dist;
         let defocus_disk_u = u * defocus_radius;
         let defocus_disk_v = v * defocus_radius;
 
@@ -145,8 +144,8 @@ impl Camera {
     }
 
     fn defocus_disk_sample(&self) -> Vec3 {
-        let p: Vec3 = random_in_unit_disk();
-        self.center + (self.defocus_disk_u * p.x()) + (self.defocus_disk_v * p.y())
+        let p: Vec3 = Vec3::random_in_unit_disk();
+        self.center + (self.defocus_disk_u * p.x) + (self.defocus_disk_v * p.y)
     }
 
     fn ray_color(&self, ray: &Ray, depth: u32, world: &HittableList) -> Vec3 {
@@ -170,11 +169,12 @@ impl Camera {
         let normalized_direction: Vec3 = ray.direction() / ray.direction().length();
         let white: Vec3 = Vec3::new(1.0, 1.0, 1.0);
         let blue: Vec3 = Vec3::new(0.5, 0.7, 1.0);
-        let a: f64 = 0.5 * (normalized_direction.y() + 1.0);
+        let a: f64 = 0.5 * (normalized_direction.y + 1.0);
         blue * a + white * (1.0 - a)
     }
 
     pub fn render(&self, handle: &mut BufWriter<StdoutLock<'_>>, world: &HittableList) {
+        // TODO: return a Vec<u8> here instead, to decouple computation with I/O
         writeln!(
             handle,
             "P3\n{} {}\n255\n",
@@ -188,10 +188,10 @@ impl Camera {
                 let mut color: Color = Vec3::default();
                 // Anti-aliasing
                 for _ in 0..self.samples_per_pixel {
-                    let offset = random_offset_vector();
+                    let offset = Vec3::random_offset_vector();
                     let pji = self.p00_loc
-                        + (self.delta_x * (i as f64 + offset.x()))
-                        + (self.delta_y * (j as f64 + offset.y()));
+                        + (self.delta_x * (i as f64 + offset.x))
+                        + (self.delta_y * (j as f64 + offset.y));
                     let ray_origin = if self.defocus_angle <= 0.0 {
                         self.center
                     } else {

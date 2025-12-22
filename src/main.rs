@@ -1,24 +1,24 @@
 mod camera;
 mod color;
+mod common;
 mod hittable;
 mod hittable_list;
 mod interval;
 mod material;
 mod ray;
 mod sphere;
-mod utils;
 mod vec3;
 
 use std::io::{self, BufWriter};
 
 use crate::{
     camera::Camera,
-    color::{Color, random_color},
+    color::random_color,
+    common::random_float,
     hittable_list::HittableList,
     material::{Dielectric, Lambertian, Metal},
     sphere::Sphere,
-    utils::random_float,
-    vec3::Vec3,
+    vec3::{Color, Vec3},
 };
 
 fn main() {
