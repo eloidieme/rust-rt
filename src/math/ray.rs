@@ -1,4 +1,4 @@
-use crate::vec3::{Point3, Vec3};
+use crate::math::vec3::{Point3, Vec3};
 
 #[derive(Debug, Clone, Copy)]
 /// Represents a ray with an origin and a direction.

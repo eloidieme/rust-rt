@@ -1,4 +1,4 @@
-use crate::{ray::Ray, vec3::Vec3};
+use crate::math::{ray::Ray, vec3::Vec3};
 
 #[derive(Debug, Clone)]
 /// Represents a camera in the scene.

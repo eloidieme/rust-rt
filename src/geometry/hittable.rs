@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use crate::{interval::Interval, material::Material, ray::Ray, vec3::Vec3};
+use crate::{
+    imaging::material::Material,
+    math::{interval::Interval, ray::Ray, vec3::Vec3},
+};
 
 /// Records details of a ray-object intersection.
 pub struct HitRecord {

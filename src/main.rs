@@ -1,24 +1,13 @@
-mod camera;
-mod canvas;
-mod color;
-mod common;
-mod hittable;
-mod hittable_list;
-mod interval;
-mod material;
-mod ray;
-mod renderer;
-mod scene;
-mod sphere;
-mod vec3;
-
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::PathBuf;
 
-use clap::Parser;
+use rust_rt::{
+    imaging::{Canvas, Renderer},
+    scene,
+};
 
-use crate::{canvas::Canvas, renderer::Renderer};
+use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]

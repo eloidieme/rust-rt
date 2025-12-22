@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
 use crate::{
-    camera::Camera,
     common,
-    hittable_list::HittableList,
-    material::{Dielectric, Lambertian, Material, Metal},
-    sphere::Sphere,
-    vec3::{Color, Vec3},
+    geometry::{hittable_list::HittableList, sphere::Sphere},
+    imaging::{
+        camera::Camera,
+        material::{Dielectric, Lambertian, Material, Metal},
+    },
+    math::vec3::{Color, Vec3},
 };
 
 /// Generates a random scene similar to the cover of "Ray Tracing in One Weekend".

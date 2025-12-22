@@ -1,7 +1,6 @@
 use crate::{
-    hittable::{HitRecord, Hittable},
-    interval::Interval,
-    ray::Ray,
+    geometry::hittable::{HitRecord, Hittable},
+    math::{interval::Interval, ray::Ray},
 };
 use std::boxed::Box;
 

@@ -1,4 +1,4 @@
-use crate::vec3::Color;
+use crate::math::vec3::Color;
 use std::io::Write;
 
 /// Converts a linear color to gamma-corrected RGB bytes.

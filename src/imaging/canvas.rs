@@ -2,7 +2,7 @@ use image::{Rgb, RgbImage};
 use std::io::{self, Write};
 use std::path::Path;
 
-use crate::{color::to_rgb_bytes, vec3::Color};
+use crate::{imaging::color::to_rgb_bytes, math::vec3::Color};
 
 /// Represents a canvas of pixels.
 pub struct Canvas {
@@ -60,7 +60,7 @@ impl Canvas {
         writeln!(writer, "P3\n{} {}\n255", self.width, self.height)?;
 
         for pixel in &self.pixels {
-            crate::color::write_color(*pixel, writer);
+            crate::imaging::color::write_color(*pixel, writer);
         }
 
         Ok(())

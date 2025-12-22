@@ -2,8 +2,10 @@ use indicatif::{ParallelProgressIterator, ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 
 use crate::{
-    camera::Camera, canvas::Canvas, common, hittable::Hittable, hittable_list::HittableList,
-    interval::Interval, ray::Ray, vec3::Color,
+    common,
+    geometry::{hittable::Hittable, hittable_list::HittableList},
+    imaging::{camera::Camera, canvas::Canvas},
+    math::{interval::Interval, ray::Ray, vec3::Color},
 };
 
 /// Handles the rendering process.

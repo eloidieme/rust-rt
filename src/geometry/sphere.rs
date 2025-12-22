@@ -1,11 +1,9 @@
 use std::sync::Arc;
 
 use crate::{
-    hittable::{HitRecord, Hittable},
-    interval::Interval,
-    material::Material,
-    ray::Ray,
-    vec3::Vec3,
+    geometry::hittable::{HitRecord, Hittable},
+    imaging::material::Material,
+    math::{interval::Interval, ray::Ray, vec3::Vec3},
 };
 
 /// A sphere object in the scene.

@@ -1,8 +1,10 @@
 use crate::{
     common,
-    hittable::HitRecord,
-    ray::Ray,
-    vec3::{Color, Vec3},
+    geometry::hittable::HitRecord,
+    math::{
+        ray::Ray,
+        vec3::{Color, Vec3},
+    },
 };
 
 #[derive(Debug)]
