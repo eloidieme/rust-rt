@@ -14,7 +14,6 @@ use std::io::{self, BufWriter};
 use crate::{
     camera::Camera,
     color::random_color,
-    common::random_float,
     hittable_list::HittableList,
     material::{Dielectric, Lambertian, Metal},
     sphere::Sphere,
@@ -36,11 +35,11 @@ fn main() {
 
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat = random_float(0.0, 1.0);
+            let choose_mat = common::random();
             let center = Vec3::new(
-                a as f64 + 0.9 * random_float(0.0, 1.0),
+                a as f64 + 0.9 * common::random(),
                 0.2,
-                b as f64 + 0.9 * random_float(0.0, 1.0),
+                b as f64 + 0.9 * common::random(),
             );
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
@@ -49,7 +48,7 @@ fn main() {
                     world.add(Sphere::new(center, 0.2, Lambertian::new(albedo)));
                 } else if choose_mat < 0.95 {
                     let albedo = random_color(0.5, 1.0);
-                    let fuzz = random_float(0.0, 0.5);
+                    let fuzz = common::random_range(0.0, 0.5);
                     world.add(Sphere::new(center, 0.2, Metal::new(albedo, fuzz)));
                 } else {
                     world.add(Sphere::new(center, 0.2, Dielectric::new(1.5)));

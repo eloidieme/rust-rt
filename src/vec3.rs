@@ -67,19 +67,15 @@ impl Vec3 {
 
     /// Generates a random vector with components in [0.0, 1.0).
     pub fn random() -> Self {
-        Vec3::new(
-            common::random_float(0.0, 1.0),
-            common::random_float(0.0, 1.0),
-            common::random_float(0.0, 1.0),
-        )
+        Vec3::new(common::random(), common::random(), common::random())
     }
 
     /// Generates a random vector with components in [min, max)
     pub fn random_range(min: f64, max: f64) -> Self {
         Vec3::new(
-            common::random_float(min, max),
-            common::random_float(min, max),
-            common::random_float(min, max),
+            common::random_range(min, max),
+            common::random_range(min, max),
+            common::random_range(min, max),
         )
     }
 
@@ -102,8 +98,8 @@ impl Vec3 {
     pub fn random_in_unit_disk() -> Self {
         loop {
             let p = Vec3::new(
-                common::random_float(-1.0, 1.0),
-                common::random_float(-1.0, 1.0),
+                common::random_range(-1.0, 1.0),
+                common::random_range(-1.0, 1.0),
                 0.0,
             );
             if p.length_squared() < 1.0 {
@@ -115,8 +111,8 @@ impl Vec3 {
     /// Generates a random offset for pixel sampling (Square distribution).
     pub fn random_offset_vector() -> Vec3 {
         Vec3::new(
-            common::random_float(-0.5, 0.5),
-            common::random_float(-0.5, 0.5),
+            common::random_range(-0.5, 0.5),
+            common::random_range(-0.5, 0.5),
             0.0,
         )
     }

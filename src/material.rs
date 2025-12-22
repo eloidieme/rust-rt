@@ -1,5 +1,5 @@
 use crate::{
-    common::random_float,
+    common,
     hittable::HitRecord,
     ray::Ray,
     vec3::{Color, Vec3},
@@ -103,12 +103,11 @@ impl Material for Dielectric {
         let sin_theta = f64::sqrt(1.0 - cos_theta * cos_theta);
 
         let cannot_refract = ri * sin_theta > 1.0;
-        let direction =
-            if cannot_refract || self.reflectance(cos_theta, ri) > random_float(0.0, 1.0) {
-                unit_direction.reflect(rec.normal)
-            } else {
-                unit_direction.refract(rec.normal, ri)
-            };
+        let direction = if cannot_refract || self.reflectance(cos_theta, ri) > common::random() {
+            unit_direction.reflect(rec.normal)
+        } else {
+            unit_direction.refract(rec.normal, ri)
+        };
 
         let scattered = Ray::new(rec.p, direction);
 

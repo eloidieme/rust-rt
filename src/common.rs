@@ -1,14 +1,16 @@
-use rand::Rng;
+use rand::{SeedableRng, prelude::*, rngs::SmallRng};
+use std::cell::RefCell;
 
-pub fn linear_to_gamma(linear: f64) -> f64 {
-    if linear > 0.0 {
-        return linear.sqrt();
-    }
-
-    return 0.0;
+thread_local! {
+    static ORACLE: RefCell<SmallRng> = RefCell::new(SmallRng::from_os_rng())
 }
 
-pub fn random_float(min: f64, max: f64) -> f64 {
-    let mut rng = rand::rng();
-    rng.random_range(min..max)
+/// Returns a random float in [0.0, 1.0)
+pub fn random() -> f64 {
+    ORACLE.with(|rng| rng.borrow_mut().random())
+}
+
+/// Returns a random float in [min, max)
+pub fn random_range(min: f64, max: f64) -> f64 {
+    ORACLE.with(|rng| rng.borrow_mut().random_range(min..max))
 }

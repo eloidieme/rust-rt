@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use crate::{
-    common::{linear_to_gamma, random_float},
+    common::random_range,
     vec3::{Color, Vec3},
 };
 
@@ -18,8 +18,16 @@ pub fn write_color<T: Write>(color: Color, handle: &mut T) {
 
 pub fn random_color(min: f64, max: f64) -> Color {
     Vec3::new(
-        random_float(min, max),
-        random_float(min, max),
-        random_float(min, max),
+        random_range(min, max),
+        random_range(min, max),
+        random_range(min, max),
     )
+}
+
+pub fn linear_to_gamma(linear: f64) -> f64 {
+    if linear > 0.0 {
+        return linear.sqrt();
+    }
+
+    return 0.0;
 }
