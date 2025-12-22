@@ -3,7 +3,6 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct SceneConfig {
-    pub width: u32,
     pub aspect_ratio: f64,
     pub camera: CameraConfig,
     pub objects: Vec<ObjectConfig>,

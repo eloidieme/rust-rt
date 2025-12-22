@@ -23,7 +23,11 @@ impl Engine {
         }
     }
 
-    pub fn load_scene_from_file(&self, path: &str) -> (HittableList, Camera, u32, u32, Background) {
+    pub fn load_scene_from_file(
+        &self,
+        path: &str,
+        width: u32,
+    ) -> (HittableList, Camera, u32, u32, Background) {
         let yaml_data = fs::read_to_string(path).expect("Unable to read scene file");
         let config: SceneConfig = serde_yaml::from_str(&yaml_data).expect("Invalid scene YAML");
 
@@ -59,9 +63,9 @@ impl Engine {
             .focus_dist(config.camera.focus_dist)
             .build();
 
-        let height = (config.width as f64 / config.aspect_ratio) as u32;
+        let height = (width as f64 / config.aspect_ratio) as u32;
 
-        (world, camera, config.width, height, config.background)
+        (world, camera, width, height, config.background)
     }
 
     pub fn render(

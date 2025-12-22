@@ -8,7 +8,7 @@ use rust_rt::{engine::Engine, scene};
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Width of the output image (ignored if scene file is used)
+    /// Width of the output image
     #[arg(short = 'w', long, default_value_t = 1200)]
     width: u32,
 
@@ -35,7 +35,7 @@ fn main() {
 
     let (world, camera, width, height, background) = if let Some(ref path) = args.scene {
         println!("Loading scene from {}...", path);
-        engine.load_scene_from_file(path)
+        engine.load_scene_from_file(path, args.width)
     } else {
         println!("No scene file provided. Generating random book scene...");
         let aspect_ratio = 16.0 / 9.0;

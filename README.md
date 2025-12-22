@@ -22,7 +22,7 @@ cargo build --release
 ### Render with a scene file
 
 ```bash
-cargo run --release -- --scene scenes/default.yaml -o renders/output.png
+cargo run --release -- --scene scenes/simple.yaml -w 1920 -o renders/output.png
 ```
 
 ### Render random scene
@@ -33,7 +33,7 @@ cargo run --release -- -w 1920 -s 500 -d 50 -o renders/random.png
 
 ### Command-line Options
 
-- `-w, --width <WIDTH>`: Image width in pixels (default: 1200, ignored if scene file is used)
+- `-w, --width <WIDTH>`: Image width in pixels (default: 1200)
 - `-s, --samples <SAMPLES>`: Number of random samples per pixel (default: 100)
 - `-d, --depth <DEPTH>`: Maximum number of ray bounces (default: 50)
 - `--scene <PATH>`: Path to a scene YAML file
@@ -44,7 +44,6 @@ cargo run --release -- -w 1920 -s 500 -d 50 -o renders/random.png
 Scene files are written in YAML. See the `scenes/` directory for examples.
 
 ```yaml
-width: 800
 aspect_ratio: 1.777
 camera:
   look_from: { x: 13.0, y: 2.0, z: 3.0 }
@@ -123,7 +122,6 @@ See the `scenes/` directory for example scene files:
 
 - `default.yaml` - Three glass spheres
 - `simple.yaml` - Basic material showcase
-- `cornell_box.yaml` - Cornell box (walls and spheres)
 - `sunset.yaml` - Demonstration of gradient backgrounds
 
 ## License
